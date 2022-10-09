@@ -261,6 +261,7 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 	}
 
 	if secondKey == "" || biggestKey == "" {
+		fmt.Println(fmt.Sprintf("\n\n\n %s/%s", imageName, expected))
 		fmt.Println(comparison2)
 		fmt.Println(secondKey)
 		fmt.Println(biggestKey)
@@ -359,17 +360,6 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 		result = output(biggestKey, secondKey)
 		correctAns += biggestKey + " " + secondKey
 	}
-	//if comparisonTops["secondKey"][1] > 75 && comparisonTops["biggestKey"][1] > 75 {
-	//	if comparisonTops["secondKey"][1] < comparisonTops["biggestKey"][1] {
-	//		result = output(secondKey, biggestKey)
-	//	} else {
-	//		result = output(biggestKey, secondKey)
-	//	}
-	//} else if comparisonTops["secondKey"][1] > 75 {
-	//	result = output(secondKey, biggestKey)
-	//} else {
-	//	result = output(biggestKey, secondKey)
-	//}
 
 	if result == expected {
 		//br-tl,br-bl,tl-tr,tr-br,bl-tl,bl-tr,bl-br,br-tr,tl-br,tl-bl,tr-tl,tr-bl,truth
@@ -380,14 +370,22 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 		correctString += Melbie(comparisonSides["tr-br"]) + Melbie(comparisonSides["bl-tl"]) + Melbie(comparisonSides["bl-tr"])
 		correctString += Melbie(comparisonSides["bl-br"]) + Melbie(comparisonSides["br-tr"]) + Melbie(comparisonSides["tl-br"])
 		correctString += Melbie(comparisonSides["tl-bl"]) + Melbie(comparisonSides["tr-tl"]) + Melbie(comparisonSides["tr-bl"]) + correctAns + "\n"
-		f, _ := os.OpenFile("correct.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-		if _, err := f.Write([]byte(correctString)); err != nil {
-			fmt.Println(err)
-		}
+		//f, _ := os.OpenFile("correct.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		//if _, err := f.Write([]byte(correctString)); err != nil {
+		//	fmt.Println(err)
+		//}
 		return result, false
 	} else {
+		//fmt.Println("Inner 5x5 Result:")
+		//True if invalid
+		if getMiddle5x5(result, pixels) {
+			return result, false
+		}
+		//fmt.Println("Inner 5x5 Expected:")
+		getMiddle5x5(expected, pixels)
+
 		debugString += fmt.Sprintf("FAILED TEST: expected:%s | result:%s", expected, result)
-		fmt.Println(debugString)
+		//fmt.Println(debugString)
 		return result, true
 	}
 
@@ -504,4 +502,161 @@ func timed(name string) func() {
 	return func() {
 		fmt.Println(time.Since(start))
 	}
+}
+
+// Grab middle + of pixels and compare, we want low difference and low standard deviation on non white but we need to filter out white space.
+// Call middle plus 5x5 of each corner in middle.
+func getMiddle5x5(output string, pixels [][]Pixel) bool {
+	var tl, tr, bl, br [5][5]Pixel
+	if output[0] == '3' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				tl[i][j] = pixels[i][j]
+			}
+		}
+	} else if output[0] == '2' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				tl[i][j] = pixels[i][j+59]
+			}
+		}
+	} else if output[0] == '1' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				tl[i][j] = pixels[i+59][j]
+			}
+		}
+	} else {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				tl[i][j] = pixels[i+59][j+59]
+			}
+		}
+	}
+
+	// tr
+	if output[1] == '3' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				tr[i][j] = pixels[i][j+64]
+			}
+		}
+	} else if output[1] == '2' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				tr[i][j] = pixels[i+64][j]
+			}
+		}
+	} else if output[1] == '1' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				tr[i][j] = pixels[i][j+123]
+			}
+		}
+	} else {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				tr[i][j] = pixels[i+59][j+123]
+			}
+		}
+	}
+
+	//bl
+	if output[2] == '3' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				bl[i][j] = pixels[i+64][j]
+			}
+		}
+	} else if output[2] == '2' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				bl[i][j] = pixels[i+64][j+59]
+			}
+		}
+	} else if output[2] == '1' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				bl[i][j] = pixels[i+123][j]
+			}
+		}
+	} else {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				bl[i][j] = pixels[i+123][j+59]
+			}
+		}
+	}
+
+	//br
+	if output[3] == '3' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				br[i][j] = pixels[i+64][j+64]
+			}
+		}
+	} else if output[3] == '2' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				br[i][j] = pixels[i+64][j+123]
+			}
+		}
+	} else if output[3] == '1' {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				br[i][j] = pixels[i+123][j+64]
+			}
+		}
+	} else {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				br[i][j] = pixels[i+123][j+123]
+			}
+		}
+	}
+
+	return checkInner(tl, tr, bl, br)
+}
+
+// Takes in 4 boxes // returns FALSE IF NOT VALID
+func checkInner(tl [5][5]Pixel, tr [5][5]Pixel, bl [5][5]Pixel, br [5][5]Pixel) bool {
+	tlRes := comparePixelMatrix(tl)
+	trRes := comparePixelMatrix(tr)
+	blRes := comparePixelMatrix(bl)
+	brRes := comparePixelMatrix(br)
+
+	mean := (tlRes[0] + trRes[0] + blRes[0] + brRes[0]) / 4.0
+	variance := math.Sqrt((math.Pow(mean-tlRes[0], 2) + math.Pow(mean-trRes[0], 2) + math.Pow(mean-blRes[0], 2) + math.Pow(mean-brRes[0], 2)) / 4.0)
+	//fmt.Println(variance)
+
+	//fmt.Println(tlRes)
+	//fmt.Println(trRes)
+	//fmt.Println(blRes)
+	//fmt.Println(brRes)
+	if variance > mean*.15 {
+		fmt.Println("ITS INVALID!!!")
+		return true
+	}
+
+	return false
+}
+
+func comparePixelMatrix(s1 [5][5]Pixel) []float64 {
+	var avg float64
+	for _, row := range s1 {
+		for _, pixel := range row {
+			avg += 0.299*float64(pixel.R) + 0.587*float64(pixel.G) + 0.114*float64(pixel.B)
+		}
+	}
+	avg /= 25.0
+
+	var s1Grayed []float64
+	for _, row := range s1 {
+		for _, pixel := range row {
+			gray := 0.299*float64(pixel.R) + 0.587*float64(pixel.G) + 0.114*float64(pixel.B)
+			s1Grayed = append(s1Grayed, gray)
+		}
+	}
+
+	return []float64{math.Round(avg*100) / 100, stdDev(s1Grayed)}
 }
