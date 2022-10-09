@@ -7,6 +7,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -106,7 +107,7 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 	debugString := fmt.Sprintf("\n\nNEW TEST: %s/%s\n", expected, imageName)
 
 	pixels, err := getPixels(file)
-	//Pixels = [0:127][0:127]
+	//Pixels = [0:127][0:127]=
 
 	if err != nil {
 		fmt.Println("Error: Image could not be decoded")
@@ -212,45 +213,73 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 		debugString += fmt.Sprintf("%f", element[0]) + " " + fmt.Sprintf("%f", element[1]) + "\n"
 	}
 
-	//TODO - throw away data with STD DEV < 3 and Difference <3
-	var keysUnder10 []string
-	avg := 0.0
-	count := 0.0
-	for _, element := range comparisonSides {
-		if element[0] != 0 {
-			avg += element[0]
-			count += 1
-		}
+	keys := make([]int, len(comparisonSides))
+
+	i := 0
+	for _, k := range comparisonSides {
+		keys[i] = int(k[1] - k[0])
+		i++
 	}
-	avg /= count
+
+	sort.Sort(sort.Reverse(sort.IntSlice(keys)))
+
+	comparison2 := make(map[int]string)
 	for key, element := range comparisonSides {
-		if element[0] < avg {
-			keysUnder10 = append(keysUnder10, key)
-		}
+		comparison2[int(element[1]-element[0])] = key
 	}
 
-	//fmt.Println(keysUnder10)
-	//fmt.Println(comparisonSides)
+	biggestKey := comparison2[keys[0]]
+	usedTile1 := biggestKey[:2]
+	usedTile2 := biggestKey[3:]
 
-	biggest := 0.0
-	biggestKey := ""
-	secondBiggest := 0.0
 	secondKey := ""
-	for _, key := range keysUnder10 {
-		if comparisonSides[key][1] > biggest {
-			secondBiggest = biggest
-			secondKey = biggestKey
-			biggest = comparisonSides[key][1]
-			biggestKey = key
-		} else if comparisonSides[key][1] > secondBiggest {
-			secondBiggest = comparisonSides[key][1]
-			secondKey = key
+	for idx := range keys[1:] {
+		if !strings.Contains(comparison2[keys[idx]], usedTile1) && !strings.Contains(comparison2[keys[idx]], usedTile2) {
+			secondKey = comparison2[keys[idx]]
+			break
 		}
 	}
 
+	//
+	////TODO - throw away data with STD DEV < 3 and Difference <3
+	//var keysUnder10 []string
+	//avg := 0.0
+	//count := 0.0
+	//for _, element := range comparisonSides {
+	//	if element[0] != 0 {
+	//		avg += element[0]
+	//		count += 1
+	//	}
+	//}
+	//avg /= count
+	//for key, element := range comparisonSides {
+	//	if element[0] < avg {
+	//		keysUnder10 = append(keysUnder10, key)
+	//	}
+	//}
+	//
+	////fmt.Println(keysUnder10)
+	////fmt.Println(comparisonSides)
+	//
+	//biggest := 0.0
+	//biggestKey := ""
+	//secondBiggest := 0.0
+	//secondKey := ""
+	//for _, key := range keysUnder10 {
+	//	if comparisonSides[key][1] > biggest {
+	//		secondBiggest = biggest
+	//		secondKey = biggestKey
+	//		biggest = comparisonSides[key][1]
+	//		biggestKey = key
+	//	} else if comparisonSides[key][1] > secondBiggest {
+	//		secondBiggest = comparisonSides[key][1]
+	//		secondKey = key
+	//	}
+	//}
+	//
 	if secondKey == "" || biggestKey == "" {
 		fmt.Println(secondKey)
-		fmt.Println(secondBiggest)
+		//fmt.Println(secondBiggest)
 		fmt.Println(comparisonSides)
 		return "", true
 	}
