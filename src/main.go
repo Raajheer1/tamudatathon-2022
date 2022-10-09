@@ -31,20 +31,9 @@ type Subimage struct {
 func main() {
 	//training()
 	argsWithProg := os.Args[1:]
-	fmt.Println(argsWithProg[0])
+	//fmt.Println(argsWithProg[0])
 	fmt.Println(fromPy(argsWithProg[0]))
 
-}
-
-func forMelbie(path string) {
-	file, err := os.Open(path)
-
-	if err != nil {
-		fmt.Println("Error: File could not be opened")
-		os.Exit(1)
-	}
-
-	imagePrediction(file, "", "")
 }
 
 func fromPy(path string) string {
@@ -374,15 +363,6 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 		correctAns += biggestKey + " " + secondKey
 	}
 
-	correctString := Melbie(comparisonSides["br-tl"]) + Melbie(comparisonSides["br-bl"]) + Melbie(comparisonSides["tl-tr"])
-	correctString += Melbie(comparisonSides["tr-br"]) + Melbie(comparisonSides["bl-tl"]) + Melbie(comparisonSides["bl-tr"])
-	correctString += Melbie(comparisonSides["bl-br"]) + Melbie(comparisonSides["br-tr"]) + Melbie(comparisonSides["tl-br"])
-	correctString += Melbie(comparisonSides["tl-bl"]) + Melbie(comparisonSides["tr-tl"]) + Melbie(comparisonSides["tr-bl"]) + correctAns + "\n"
-	f, _ := os.OpenFile("correct.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if _, err := f.Write([]byte(correctString)); err != nil {
-		fmt.Println(err)
-	}
-
 	if result == expected {
 		return result, false
 	} else {
@@ -426,7 +406,7 @@ func reverseStr(str string) (result string) {
 }
 
 func Melbie(element []float64) string {
-	return fmt.Sprintf("%f", element[0]) + "," + fmt.Sprintf("%f", element[1]) + ","
+	return fmt.Sprintf("%f", element[0]) + " " + fmt.Sprintf("%f", element[1]) + ","
 }
 
 //END MISC

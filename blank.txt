@@ -1,0 +1,5 @@
+def make_prediction(img_path):
+    import out_strides
+    res = os.popen('go whaterver.go {img_path}').read()
+    parse res for the string in
+    return parsed_res
