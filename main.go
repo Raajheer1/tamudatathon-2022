@@ -391,7 +391,7 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 }
 
 func Melbie(element []float64) string {
-	return fmt.Sprintf("%f", element[0]) + " " + fmt.Sprintf("%f", element[1]) + ", "
+	return fmt.Sprintf("%f", element[0]) + " " + fmt.Sprintf("%f", element[1]) + ","
 }
 
 func output(s1 string, s2 string) string {
