@@ -29,7 +29,7 @@ type Subimage struct {
 }
 
 func main() {
-	//training()
+	training()
 	//fmt.Println(fromPy("./train/0123/00000.png"))
 }
 
@@ -348,10 +348,13 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 
 	result := ""
 
+	correctAns := ""
 	if (comparisonTops["secondKey"][1] - comparisonTops["secondKey"][0]) > (comparisonTops["biggestKey"][1] - comparisonTops["biggestKey"][0]) {
 		result = output(secondKey, biggestKey)
+		correctAns += secondKey + " " + biggestKey
 	} else {
 		result = output(biggestKey, secondKey)
+		correctAns += biggestKey + " " + secondKey
 	}
 	//if comparisonTops["secondKey"][1] > 75 && comparisonTops["biggestKey"][1] > 75 {
 	//	if comparisonTops["secondKey"][1] < comparisonTops["biggestKey"][1] {
@@ -366,6 +369,18 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 	//}
 
 	if result == expected {
+		//br-tl,br-bl,tl-tr,tr-br,bl-tl,bl-tr,bl-br,br-tr,tl-br,tl-bl,tr-tl,tr-bl,truth
+		//diff std, diff std , ... , tl-tr bl-br
+
+		//fmt.Sprintf("%f", element[0]) + " " + fmt.Sprintf("%f", element[1]) + "\n"
+		correctString := Melbie(comparisonSides["br-tl"]) + Melbie(comparisonSides["br-bl"]) + Melbie(comparisonSides["tl-tr"])
+		correctString += Melbie(comparisonSides["tr-br"]) + Melbie(comparisonSides["bl-tl"]) + Melbie(comparisonSides["bl-tr"])
+		correctString += Melbie(comparisonSides["bl-br"]) + Melbie(comparisonSides["br-tr"]) + Melbie(comparisonSides["tl-br"])
+		correctString += Melbie(comparisonSides["tr-tl"]) + Melbie(comparisonSides["tr-bl"]) + correctAns + "\n"
+		f, _ := os.OpenFile("correct.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if _, err := f.Write([]byte(correctString)); err != nil {
+			fmt.Println(err)
+		}
 		return result, false
 	} else {
 		debugString += fmt.Sprintf("FAILED TEST: expected:%s | result:%s", expected, result)
@@ -373,6 +388,10 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 		return result, true
 	}
 
+}
+
+func Melbie(element []float64) string {
+	return fmt.Sprintf("%f", element[0]) + " " + fmt.Sprintf("%f", element[1]) + ", "
 }
 
 func output(s1 string, s2 string) string {
