@@ -240,43 +240,6 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 		}
 	}
 
-	//
-	////TODO - throw away data with STD DEV < 3 and Difference <3
-	//var keysUnder10 []string
-	//avg := 0.0
-	//count := 0.0
-	//for _, element := range comparisonSides {
-	//	if element[0] != 0 {
-	//		avg += element[0]
-	//		count += 1
-	//	}
-	//}
-	//avg /= count
-	//for key, element := range comparisonSides {
-	//	if element[0] < avg {
-	//		keysUnder10 = append(keysUnder10, key)
-	//	}
-	//}
-	//
-	////fmt.Println(keysUnder10)
-	////fmt.Println(comparisonSides)
-	//
-	//biggest := 0.0
-	//biggestKey := ""
-	//secondBiggest := 0.0
-	//secondKey := ""
-	//for _, key := range keysUnder10 {
-	//	if comparisonSides[key][1] > biggest {
-	//		secondBiggest = biggest
-	//		secondKey = biggestKey
-	//		biggest = comparisonSides[key][1]
-	//		biggestKey = key
-	//	} else if comparisonSides[key][1] > secondBiggest {
-	//		secondBiggest = comparisonSides[key][1]
-	//		secondKey = key
-	//	}
-	//}
-	//
 	if secondKey == "" || biggestKey == "" {
 		fmt.Println(secondKey)
 		//fmt.Println(secondBiggest)
@@ -364,17 +327,23 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 	}
 
 	result := ""
-	if comparisonTops["secondKey"][1] > 75 && comparisonTops["biggestKey"][1] > 75 {
-		if comparisonTops["secondKey"][1] < comparisonTops["biggestKey"][1] {
-			result = output(secondKey, biggestKey)
-		} else {
-			result = output(biggestKey, secondKey)
-		}
-	} else if comparisonTops["secondKey"][1] > 75 {
+
+	if (comparisonTops["secondKey"][1] - comparisonTops["secondKey"][0]) > (comparisonTops["biggestKey"][1] - comparisonTops["biggestKey"][0]) {
 		result = output(secondKey, biggestKey)
 	} else {
 		result = output(biggestKey, secondKey)
 	}
+	//if comparisonTops["secondKey"][1] > 75 && comparisonTops["biggestKey"][1] > 75 {
+	//	if comparisonTops["secondKey"][1] < comparisonTops["biggestKey"][1] {
+	//		result = output(secondKey, biggestKey)
+	//	} else {
+	//		result = output(biggestKey, secondKey)
+	//	}
+	//} else if comparisonTops["secondKey"][1] > 75 {
+	//	result = output(secondKey, biggestKey)
+	//} else {
+	//	result = output(biggestKey, secondKey)
+	//}
 
 	if result == expected {
 		return result, false
