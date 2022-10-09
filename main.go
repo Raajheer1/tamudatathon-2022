@@ -29,6 +29,26 @@ type Subimage struct {
 }
 
 func main() {
+	//training()
+	//fmt.Println(fromPy("./train/0123/00000.png"))
+}
+
+//export fromPy
+func fromPy(path string) string {
+	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
+
+	file, err := os.Open(path)
+
+	if err != nil {
+		fmt.Println("Error: File could not be opened")
+		os.Exit(1)
+	}
+
+	result, _ := imagePrediction(file, "", "")
+	return result
+}
+
+func training() {
 	done := timed("Running Program")
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 
