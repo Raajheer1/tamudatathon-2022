@@ -376,24 +376,38 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 		//}
 		return result, false
 	} else {
-		//fmt.Println("Inner 5x5 Result:")
+		fmt.Println("Inner 5x5 Result:")
 		//True if invalid
 		if getMiddle5x5(result, pixels) {
-			return result, false
+			//Remove this result from possible results and try again
+			if !getMiddle5x5(reverseStr(result), pixels) {
+				return result, result == expected
+			}
 		}
-		//fmt.Println("Inner 5x5 Expected:")
+		fmt.Println("Inner 5x5 Expected:")
 		getMiddle5x5(expected, pixels)
 
 		debugString += fmt.Sprintf("FAILED TEST: expected:%s | result:%s", expected, result)
-		//fmt.Println(debugString)
+		fmt.Println(debugString)
 		return result, true
 	}
 
 }
 
+// MISC
+func reverseStr(str string) (result string) {
+	// iterate over str and prepend to result
+	for _, v := range str {
+		result = string(v) + result
+	}
+	return
+}
+
 func Melbie(element []float64) string {
 	return fmt.Sprintf("%f", element[0]) + " " + fmt.Sprintf("%f", element[1]) + ","
 }
+
+//END MISC
 
 func output(s1 string, s2 string) string {
 	out := ""
@@ -629,11 +643,11 @@ func checkInner(tl [5][5]Pixel, tr [5][5]Pixel, bl [5][5]Pixel, br [5][5]Pixel) 
 	variance := math.Sqrt((math.Pow(mean-tlRes[0], 2) + math.Pow(mean-trRes[0], 2) + math.Pow(mean-blRes[0], 2) + math.Pow(mean-brRes[0], 2)) / 4.0)
 	//fmt.Println(variance)
 
-	//fmt.Println(tlRes)
-	//fmt.Println(trRes)
-	//fmt.Println(blRes)
-	//fmt.Println(brRes)
-	if variance > mean*.15 {
+	fmt.Println(tlRes)
+	fmt.Println(trRes)
+	fmt.Println(blRes)
+	fmt.Println(brRes)
+	if variance > mean*.20 {
 		fmt.Println("ITS INVALID!!!")
 		return true
 	}
