@@ -261,9 +261,12 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 	}
 
 	if secondKey == "" || biggestKey == "" {
+		fmt.Println(comparison2)
 		fmt.Println(secondKey)
+		fmt.Println(biggestKey)
+		fmt.Println(keys)
 		//fmt.Println(secondBiggest)
-		fmt.Println(comparisonSides)
+		//fmt.Println(comparisonSides)
 		return "", true
 	}
 
@@ -376,7 +379,7 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 		correctString := Melbie(comparisonSides["br-tl"]) + Melbie(comparisonSides["br-bl"]) + Melbie(comparisonSides["tl-tr"])
 		correctString += Melbie(comparisonSides["tr-br"]) + Melbie(comparisonSides["bl-tl"]) + Melbie(comparisonSides["bl-tr"])
 		correctString += Melbie(comparisonSides["bl-br"]) + Melbie(comparisonSides["br-tr"]) + Melbie(comparisonSides["tl-br"])
-		correctString += Melbie(comparisonSides["tr-tl"]) + Melbie(comparisonSides["tr-bl"]) + correctAns + "\n"
+		correctString += Melbie(comparisonSides["tl-bl"]) + Melbie(comparisonSides["tr-tl"]) + Melbie(comparisonSides["tr-bl"]) + correctAns + "\n"
 		f, _ := os.OpenFile("correct.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if _, err := f.Write([]byte(correctString)); err != nil {
 			fmt.Println(err)
