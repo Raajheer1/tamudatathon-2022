@@ -233,19 +233,19 @@ func imagePrediction(file io.Reader, expected string, imageName string) (string,
 		debugString += fmt.Sprintf("%f", element[0]) + " " + fmt.Sprintf("%f", element[1]) + "\n"
 	}
 
-	keys := make([]int, len(comparisonSides))
+	keys := make([]float64, len(comparisonSides))
 
 	i := 0
 	for _, k := range comparisonSides {
-		keys[i] = int(k[1] - k[0])
+		keys[i] = k[1] - k[0]
 		i++
 	}
 
-	sort.Sort(sort.Reverse(sort.IntSlice(keys)))
+	sort.Sort(sort.Reverse(sort.Float64Slice(keys)))
 
-	comparison2 := make(map[int]string)
+	comparison2 := make(map[float64]string)
 	for key, element := range comparisonSides {
-		comparison2[int(element[1]-element[0])] = key
+		comparison2[(element[1] - element[0])] = key
 	}
 
 	biggestKey := comparison2[keys[0]]
