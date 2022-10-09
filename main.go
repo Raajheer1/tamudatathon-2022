@@ -116,17 +116,7 @@ func main() {
 			}
 		}
 	}
-
-	//fmt.Println(TopLeft)
-	//fmt.Println(TopRight)
-	//fmt.Println(BottomLeft)
-	//fmt.Println(BottomRight)
-	//TopLeft.countPixels()
-	//TopRight.countPixels()
-	//BottomLeft.countPixels()
-	//BottomRight.countPixels()
-
-	//similarPixels(TopLeft.right[0], TopLeft.right[50])
+	
 	fmt.Println(compareSides(TopLeft.right, TopRight.left))
 
 }
